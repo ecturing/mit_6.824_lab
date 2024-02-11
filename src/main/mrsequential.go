@@ -4,7 +4,7 @@ package main
 // simple sequential MapReduce.
 //
 // go run mrsequential.go wc.so pg*.txt
-//
+//简单的顺序MapReduce。
 
 import "fmt"
 import "6.824/mr"
@@ -34,7 +34,7 @@ func main() {
 	// read each input file,
 	// pass it to Map,
 	// accumulate the intermediate Map output.
-	//
+	//读取每个输入文件，将其传递给Map，累积中间Map输出。
 	intermediate := []mr.KeyValue{}
 	for _, filename := range os.Args[2:] {
 		file, err := os.Open(filename)
@@ -54,7 +54,7 @@ func main() {
 	// a big difference from real MapReduce is that all the
 	// intermediate data is in one place, intermediate[],
 	// rather than being partitioned into NxM buckets.
-	//
+	//一个与真正的MapReduce的很大的区别是，所有的中间数据都在一个地方，intermediate[]，而不是被分成NxM个桶。
 
 	sort.Sort(ByKey(intermediate))
 
@@ -64,7 +64,7 @@ func main() {
 	//
 	// call Reduce on each distinct key in intermediate[],
 	// and print the result to mr-out-0.
-	//
+	//调用Reduce在intermediate[]中的每个不同的键上，并将结果打印到mr-out-0。
 	i := 0
 	for i < len(intermediate) {
 		j := i + 1

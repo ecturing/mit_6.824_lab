@@ -8,7 +8,7 @@ import "hash/fnv"
 
 //
 // Map functions return a slice of KeyValue.
-//
+//Map函数返回一个KeyValue切片。
 type KeyValue struct {
 	Key   string
 	Value string
@@ -17,7 +17,7 @@ type KeyValue struct {
 //
 // use ihash(key) % NReduce to choose the reduce
 // task number for each KeyValue emitted by Map.
-//
+//使用ihash(key) % NReduce选择每个KeyValue由Map发出的reduce任务编号。
 func ihash(key string) int {
 	h := fnv.New32a()
 	h.Write([]byte(key))
@@ -30,13 +30,21 @@ func ihash(key string) int {
 //
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
-
 	// Your worker implementation here.
-
+	// 你的worker实现在这里
 	// uncomment to send the Example RPC to the coordinator.
+	// 取消注释以向协调器发送示例RPC。
 	// CallExample()
-
 }
+
+
+func CallGetTask()  {
+	args:=TaskReply{}
+	ok:=call("Coordinator.GetTask", nil, &args)
+}
+
+
+
 
 //
 // example function to show how to make an RPC call to the coordinator.
@@ -71,7 +79,7 @@ func CallExample() {
 // send an RPC request to the coordinator, wait for the response.
 // usually returns true.
 // returns false if something goes wrong.
-//
+//发送一个RPC请求到协调器，等待响应。通常返回true。如果出现问题，则返回false。
 func call(rpcname string, args interface{}, reply interface{}) bool {
 	// c, err := rpc.DialHTTP("tcp", "127.0.0.1"+":1234")
 	sockname := coordinatorSock()

@@ -8,7 +8,7 @@ package main
 // go run mrworker.go wc.so
 //
 // Please do not change this file.
-//
+//开启一个worker进程，该进程在../mr/worker.go中实现。通常会有多个worker进程，与一个协调器交谈。
 
 import "6.824/mr"
 import "plugin"

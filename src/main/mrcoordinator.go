@@ -7,7 +7,7 @@ package main
 // go run mrcoordinator.go pg*.txt
 //
 // Please do not change this file.
-//
+//启动协调器进程，该进程在../mr/coordinator.go中实现
 
 import "6.824/mr"
 import "time"
