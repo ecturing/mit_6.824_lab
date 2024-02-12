@@ -1,7 +1,7 @@
 package mr
 
 import (
-	"bufio"
+	"bytes"
 	"io"
 	"log"
 	"net"
@@ -16,14 +16,20 @@ import (
 type Coordinator struct {
 	// Your definitions here.
 	// 你的定义在这里
+	TaskList chan *TaskReply
 }
+
+
 
 // Your code here -- RPC handlers for the worker to call.
 //你的代码写在这 -- worker调用的RPC处理程序。
 
 // worker节点获取任务
-func (c *Coordinator)GetTask()  {
-	
+func (c *Coordinator)GetTask()  *TaskReply {
+	select{
+	case r:=<-c.TaskList:
+		return r
+	}
 }
 
 
@@ -72,7 +78,7 @@ func (c *Coordinator) Done() bool {
 //创建一个Coordinator。main/mrcoordinator.go调用这个函数。nReduce是要使用的reduce任务的数量。
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{}
-
+	c.TaskList=make(chan *TaskReply)
 	// Your code here.
 
 	for _, v := range files {
@@ -81,6 +87,11 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 			log.Fatal("cannot open %v",v)
 		}
 		content,err:=io.ReadAll(file)
+		res:=bytes.NewBuffer(content)
+		c.TaskList<-&TaskReply{
+			TaskSource: *res,
+			TaskName: v,
+		}
 	}
 
 	c.server()

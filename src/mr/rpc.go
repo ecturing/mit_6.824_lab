@@ -7,7 +7,6 @@ package mr
 //RPC 定义，记得将所有名称大写。
 
 import (
-	"bufio"
 	"bytes"
 	"os"
 	"strconv"

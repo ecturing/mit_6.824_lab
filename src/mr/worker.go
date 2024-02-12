@@ -30,6 +30,9 @@ func ihash(key string) int {
 //
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
+		task:=CallGetTask()
+		keyValueList:=mapf(task.TaskName,task.TaskSource.String())
+		reducef()
 	// Your worker implementation here.
 	// 你的worker实现在这里
 	// uncomment to send the Example RPC to the coordinator.
@@ -38,9 +41,14 @@ func Worker(mapf func(string, string) []KeyValue,
 }
 
 
-func CallGetTask()  {
+func CallGetTask()  *TaskReply{
 	args:=TaskReply{}
 	ok:=call("Coordinator.GetTask", nil, &args)
+	if ok{
+		return &args
+	}else{
+		return nil
+	}
 }
 
 
