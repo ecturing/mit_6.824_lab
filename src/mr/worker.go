@@ -1,12 +1,41 @@
 package mr
 
 import (
+	"bufio"
 	"fmt"
 	"hash/fnv"
+	"io"
 	"log"
 	"net/rpc"
+	"os"
 	"sort"
 )
+
+type Job struct{}
+
+type DataHandle interface{
+	//  序列化函数
+	Serialization(data []KeyValue)
+	// 反序列化函数
+	DeSerialization() []KeyValue
+}
+
+func (j Job) Serialization(data []KeyValue) {
+	intermediateFile,err:=os.Create("")
+	if err != nil {
+		return nil, err
+	}
+	writer:=bufio.NewWriter(intermediateFile)
+	for _, v := range data {
+		writer.WriteString(v.Key+":"+v.Value)
+	}
+	writer.Flush()
+
+}
+
+func (j Job) DeSerialization(file *os.File) []KeyValue{
+
+}
 
 // Map functions return a slice of KeyValue.
 // Map函数返回一个KeyValue切片。
@@ -33,15 +62,27 @@ func ihash(key string) int {
 // main/mrworker.go calls this function.
 func Worker(mapf func(string, string) []KeyValue,
 	reducef func(string, []string) string) {
+		var J Job
 	task := CallGetTask()
 	switch task.TaskType {
 	case MapTask:
-		output := mapf(task.TaskName, task.MapSource.String())
+		file,err:=os.Open(task.MapSourceAddr)
+		if err != nil {
+			return nil, err
+		}
+		fileBytes,_:=io.ReadAll(file)
+		output := mapf(task.MapSourceAddr, string(fileBytes))
+		J.Serialization(output)
 		call("Coordinator.PostWorkerOut", &PostMapRes{MapOutput: output}, nil)
 	case ReduceTask:
-
-		sort.Sort(SortBy(task.ReduceSource))
-		intermediate := []KeyValue{}
+		file,err:=os.Open(task.ReduceSourceAddr)
+		if err != nil {
+			return nil, err
+		}
+		// 反序列化文件为[]keyvalue切片，对切片进行操作
+		ReduceSource:=J.DeSerialization(file)
+		sort.Sort(SortBy(ReduceSource))
+		intermediate:=ReduceSource
 		i := 0
 		for i < len(intermediate) {
 			j := i + 1

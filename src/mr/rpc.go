@@ -7,7 +7,6 @@ package mr
 //RPC 定义，记得将所有名称大写。
 
 import (
-	"bytes"
 	"os"
 	"strconv"
 )
@@ -29,10 +28,9 @@ type WorkerAliveReply struct {
 }
 
 type TaskReply struct {
-	ReduceSource []KeyValue
-	MapSource bytes.Buffer
-	TaskName  string
-	TaskType  int // 0: map, 1: reduce
+	ReduceSourceAddr string
+	MapSourceAddr    string
+	TaskType         int // 0: map, 1: reduce
 }
 
 type PostMapRes struct {

@@ -22,14 +22,13 @@ type Coordinator struct {
 func (c *Coordinator) GetTask() *TaskReply {
 	select {
 	case r := <-c.TaskList:
-		c.WorkerList[r.TaskName] = true
 		return r
 	}
 }
 
 func (c *Coordinator) PostWorkerOut(output *PostMapRes) {
 	c.TaskList <- &TaskReply{
-		ReduceSource: output.MapOutput,
+		ReduceSourceAddr: output.MapOutput,
 		TaskName:     ,
 	}
 }
@@ -69,20 +68,16 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c.TaskList = make(chan *TaskReply)
 	c.WorkerList = make(map[string]bool)
 	// Your code here.
+	c.server()
+	go TaskHandler(&c,files)
+	return &c
+}
 
-	for _, v := range files {
-		file, err := os.Open(v)
-		if err != nil {
-			log.Fatal("cannot open %v", v)
-		}
-		content, err := io.ReadAll(file)
-		res := bytes.NewBuffer(content)
-		c.TaskList <- &TaskReply{
-			MapSource: *res,
-			TaskName:  v,
-			TaskType:  MapTask,
+func TaskHandler(c *Coordinator,files []string)  {
+	for _, fileAddr := range files {
+		c.TaskList<-&TaskReply{
+			MapSourceAddr: fileAddr,
+			TaskType: MapTask,
 		}
 	}
-	c.server()
-	return &c
 }
